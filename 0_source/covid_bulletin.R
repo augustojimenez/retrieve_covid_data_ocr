@@ -36,23 +36,19 @@ compress <- function(lista){
    return(lista)
 }
 
-get_current_bulletin <- function(){
+# Gets the date and number corresponding to the bulletin to be updated
+get_current <- function(){
    # Reference date and corresponding bulletin number
    date_0 <- as.Date("2021-04-22")
    bulletin_0 <- 400
    
-   # Calculates the new bulletin's date from the last update in RD_Suavizado.csv
-   date_df <- read.csv("./2_data/processed/RD_Suavizado.csv")
+   bulletin_csv <- list.files("./1_data/1_processed/")
+   bulletin <- max(as.numeric(stri_replace_all(bulletin_csv, "", fixed = ".csv"))) + 1
    
-   date <- try(as.Date(max(as.Date(date_df$date, format = "%m/%d/%Y"))) + 1,
-                  silent = TRUE)
-   if(is.na(date)) date = as.Date(max(as.Date(date_df$date))) + 1
-   
-   # Calculates the new bulletin number
-   bulletin <- bulletin_0 + as.numeric(date - date_0)
+   date <- date_0 + bulletin - bulletin_0
    
    values <- list(bulletin = bulletin,
-                date = date)
+                  date = date)
    
    return(values)
 }
@@ -69,7 +65,7 @@ bulletin_conversion <- function(bulletin, date, img_dir){
    # Displaying image to compare it against the resulting data frame
    print(img)
    
-   # Transforming the image and then converting it to text
+   # Preprocessing the image and then converting it to text
    text <- img %>%
       image_resize("2400") %>%
       image_convert(type = "Grayscale") %>%
@@ -78,7 +74,7 @@ bulletin_conversion <- function(bulletin, date, img_dir){
       image_ocr() %>%
       stri_split(fixed = "\n")
    
-   # Locating the table's position in image
+   # Locating the table's position in the image
    i <- which(sapply(text[[1]],
                      function(x, ...) grepl(x = x, ...),
                      pattern = "^(01|OF|oF|0F|o1|O1)"))
@@ -86,10 +82,14 @@ bulletin_conversion <- function(bulletin, date, img_dir){
    # Extracting the values from the table from i to i + 32 (there are 322 obs in
    # the table)
    text <- text[[1]][i:(i + 32)] %>%
-      stri_replace_all("", fixed = ",") %>% # removing ',' from numbers to coerce them from string to numeric
-      stri_replace_all("0 ", fixed = "- ") %>% # same as previously. A space is added at the end not to replace every occurrence
-      sapply(stri_split, fixed = " ") %>% # splits by space
-      lapply(compress) # Reformats province
+      # removing ',' from numbers to coerce them from string to numeric
+      stri_replace_all("", fixed = ",") %>%
+      # A space is added at the end not to replace every occurrence
+      stri_replace_all("0 ", fixed = "- ") %>%
+      # splits by space
+      sapply(stri_split, fixed = " ") %>%
+      # Reformats province's name
+      lapply(compress) 
    
    # New data frame's names
    names <- c("cod_province", "province", "processed", "new_cases",
@@ -120,11 +120,11 @@ bulletin_conversion <- function(bulletin, date, img_dir){
    return(df)
 }
 
-bulletin <- get_last_updated()$bulletin
-date <- get_last_updated()$date
+bulletin <- get_current()$bulletin
+date <- get_current()$date
 
-img_dir <- paste0("./1_data/0_raw/0_bulletin/bulletin", bulletin, ".jpg")
-
+img_dir <- paste0("./1_data/0_raw/0_bulletin/", bulletin, ".jpg")
+img_dir
 if (file.exists(img_dir)) {
    df <- bulletin_conversion(bulletin, date, img_dir)
    
@@ -146,9 +146,11 @@ if (file.exists(img_dir)) {
    
    # Exporting the data frame as a .csv file
    write.csv(df,
-             paste0("./1_data/0_raw/bulletin", date, ".csv"), 
+             paste0("./1_data/1_processed/", bulletin, ".csv"), 
              row.names = FALSE)
-   print("The bulletin.csv file was successfully updated.")
+   print(paste0("The bulletin file (",
+                bulletin,
+                ".csv) was successfully updated."))
 } else {
    print(paste("The bulletin", bulletin, "was not found."))
 }
