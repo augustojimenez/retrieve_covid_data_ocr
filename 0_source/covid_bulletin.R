@@ -1,3 +1,14 @@
+########################################################################
+#\ Project              : COVID-19                                    /#
+#\ Autor                : Cesar Augusto Jimenez Sanchez               /#
+#\ Created              : Apr 04 2021                                 /#
+#\ Modified             : Ago 30 2021                                 /#
+#\ Objetives            : Converting COVID-19 bulletin in jpg format  /#
+#\                        to csv. Bulletins are extracted from the    /#
+#\                        Ministry of Health of the Dominican         /#
+#\                        Republic's Instagram webpage.               /#
+########################################################################
+
 rm(list = ls())
 
 # Importing libraries
