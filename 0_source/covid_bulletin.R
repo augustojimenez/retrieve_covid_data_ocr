@@ -89,7 +89,7 @@ bulletin_conversion <- function(bulletin, date, img_dir){
    i <- which(sapply(text[[1]],
                      function(x, ...) grepl(x = x, ...),
                      # The table starts at "01", which Tesseract sometimes
-                     # interprets its as: OF, oF, 0F, o1, or O1
+                     # interprets it as: OF, oF, 0F, o1, or O1
                      pattern = "^(01|OF|oF|0F|o1|O1)"))
    
    # Extracting the values from the table from i to i + 32 (there are 322 obs in
@@ -133,17 +133,21 @@ bulletin_conversion <- function(bulletin, date, img_dir){
    return(df)
 }
 
+# Bulletin and date to be updated
 bulletin <- get_current()$bulletin
 date <- get_current()$date
 
+# Direction of the bulletin in jpg format
 img_dir <- paste0("./1_data/0_raw/0_bulletin/", bulletin, ".jpg")
-img_dir
+
 if (file.exists(img_dir)) {
+   # Converting image to data frame
    df <- bulletin_conversion(bulletin, date, img_dir)
    
    # If needed, fix data frame
    fix(df)
    
+   # Printing a summary to compare it against the image
    print(knitr::kable(format(round(colSums(mutate(df[1:33, 3:10], 
                                                   across(everything(),
                                                          as.numeric)),
@@ -151,11 +155,7 @@ if (file.exists(img_dir)) {
                                    0),
                              big.mark = ",")))
    
-   df <- rbind(df[1:33,], c(as.character(date), 
-                            "Total",
-                            colSums(mutate(df[1:33, 3:10], 
-                                           across(everything(), as.numeric)),
-                                    na.rm = TRUE)))
+   df <- rbind(df[1:33,])
    
    # Exporting the data frame as a .csv file
    write.csv(df,
