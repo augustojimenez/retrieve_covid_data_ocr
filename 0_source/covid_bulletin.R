@@ -3,7 +3,7 @@
 #\ Autor                : Cesar Augusto Jimenez Sanchez               /#
 #\ Created              : Apr 04 2021                                 /#
 #\ Modified             : Ago 30 2021                                 /#
-#\ Objetives            : Converting COVID-19 bulletin in jpg format  /#
+#\ Objetives            : Converting COVID-19 bulletin, in jpg format,/#
 #\                        to csv. Bulletins are extracted from the    /#
 #\                        Ministry of Health of the Dominican         /#
 #\                        Republic's Instagram webpage.               /#
@@ -53,9 +53,9 @@ get_current <- function(){
    date_0 <- as.Date("2021-04-22")
    bulletin_0 <- 400
    
+   # Determining last processed bulleting, and then the new bulletin and date
    bulletin_csv <- list.files("./1_data/1_processed/")
    bulletin <- max(as.numeric(stri_replace_all(bulletin_csv, "", fixed = ".csv"))) + 1
-   
    date <- date_0 + bulletin - bulletin_0
    
    values <- list(bulletin = bulletin,
@@ -88,6 +88,8 @@ bulletin_conversion <- function(bulletin, date, img_dir){
    # Locating the table's position in the image
    i <- which(sapply(text[[1]],
                      function(x, ...) grepl(x = x, ...),
+                     # The table starts at "01", which Tesseract sometimes
+                     # interprets its as: OF, oF, 0F, o1, or O1
                      pattern = "^(01|OF|oF|0F|o1|O1)"))
    
    # Extracting the values from the table from i to i + 32 (there are 322 obs in
