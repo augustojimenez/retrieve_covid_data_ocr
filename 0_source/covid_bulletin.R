@@ -55,7 +55,9 @@ get_current <- function(){
    
    # Determining last processed bulleting, and then the new bulletin and date
    bulletin_csv <- list.files("./1_data/1_processed/")
-   bulletin <- max(as.numeric(stri_replace_all(bulletin_csv, "", fixed = ".csv"))) + 1
+   bulletin <- max(as.numeric(stri_replace_all(bulletin_csv,
+                                               "",
+                                               fixed = ".csv"))) + 1
    date <- date_0 + bulletin - bulletin_0
    
    values <- list(bulletin = bulletin,
@@ -155,7 +157,7 @@ if (file.exists(img_dir)) {
                                    0),
                              big.mark = ",")))
    
-   df <- rbind(df[1:33,])
+   df <- df[1:33,]
    
    # Exporting the data frame as a .csv file
    write.csv(df,
