@@ -157,6 +157,7 @@ if (file.exists(img_dir)) {
                                    0),
                              big.mark = ",")))
    
+   # Excluding "Total" row
    df <- df[1:33,]
    
    # Exporting the data frame as a .csv file
@@ -165,7 +166,7 @@ if (file.exists(img_dir)) {
              row.names = FALSE)
    print(paste0("The bulletin file (",
                 bulletin,
-                ".csv) was successfully updated."))
+                ".csv) was successfully saved."))
 } else {
    print(paste("The bulletin", bulletin, "was not found."))
 }
