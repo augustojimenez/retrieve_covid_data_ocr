@@ -87,8 +87,11 @@ bulletin_conversion <- function(bulletin, date, img_dir){
       image_ocr() %>%
       stri_split(fixed = "\n")
    
+   # Removing empty spaces
+   text = text[[1]][text[[1]][] != ""]
+   
    # Locating the table's position in the image
-   i <- which(sapply(text[[1]],
+   i <- which(sapply(text,
                      function(x, ...) grepl(x = x, ...),
                      # The table starts at "01", which Tesseract sometimes
                      # interprets it as: OF, oF, 0F, o1, or O1
@@ -96,7 +99,7 @@ bulletin_conversion <- function(bulletin, date, img_dir){
    
    # Extracting the values from the table from i to i + 32 (there are 322 obs in
    # the table)
-   text <- text[[1]][i:(i + 32)] %>%
+   text <- text[i:(i + 32)] %>%
       # removing ',' from numbers to coerce them from string to numeric
       stri_replace_all("", fixed = ",") %>%
       # A space is added at the end not to replace every occurrence
