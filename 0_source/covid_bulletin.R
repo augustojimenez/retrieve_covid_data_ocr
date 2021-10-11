@@ -29,7 +29,7 @@ compress <- function(lista){
    # with length 10
    len = length(lista)
    # If len == 10, no transformation is necessary
-   if(len > 10){
+   if (len > 10) {
       # The first value in the list correspond to the index. The name starts at
       # the second value
       # The province name's positions goes from 2 to len - 8 
@@ -68,7 +68,7 @@ get_current <- function(){
 
 bulletin_conversion <- function(bulletin, date, img_dir){
    # Importing provinces' names
-   province <- read.csv(file = "./1_data/0_raw/1_other/province.csv", 
+   provinces <- read.csv(file = "./1_data/0_raw/1_other/province.csv", 
                           col.names = "province") %>%
       .$province
    
@@ -122,7 +122,7 @@ bulletin_conversion <- function(bulletin, date, img_dir){
                                   dimnames = list(province, names))) %>%
       mutate(across(c(3:10), as.numeric),
              date = date,
-             province = province) %>%
+             province = provinces) %>%
       select(date, province, new_cases, accu_cases, incidence,
              positivity, recovered, new_deaths, accu_deaths, processed)
    
